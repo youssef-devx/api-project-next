@@ -11,8 +11,8 @@ export async function getServerSideProps() {
   }
 }
 
-export default function Home({ posts: staticPosts }) {
-  const [posts, setPosts] = useState(staticPosts)
+export default function Home({ posts: serverSidePosts }) {
+  const [posts, setPosts] = useState(serverSidePosts)
   const [notFound, setNotFound] = useState(false)
   const [searchKeyword, setSearchKeyword] = useState("")
 
