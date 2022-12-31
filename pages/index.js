@@ -1,9 +1,9 @@
 import Head from "next/head"
 import Link from "next/link"
 import { useState } from "react"
-import { API_URL } from "./config"
+import { API_URL } from "../config"
 
-export async function getStaticProps() {
+export async function getServerSideProps() {
   const posts = await fetch(API_URL).then(res => res.json())
 
   return {
