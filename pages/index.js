@@ -1,25 +1,29 @@
 import Head from "next/head"
 import Link from "next/link"
-import { useEffect, useState } from "react"
+import { useState } from "react"
+import { API_URL } from "./config"
 
-export default function Home() {
-  const [posts, setPosts] = useState([])
-  const [loaded, setLoaded] = useState(false)
+export async function getStaticProps() {
+  const posts = await fetch(API_URL).then(res => res.json())
+
+  return {
+    props: { posts },
+  }
+}
+
+export default function Home({ posts: staticPosts }) {
+  const [posts, setPosts] = useState(staticPosts)
   const [notFound, setNotFound] = useState(false)
   const [searchKeyword, setSearchKeyword] = useState("")
-
-  useEffect(() => {
-    loadPosts()
-  }, [])
 
   async function loadPosts(search) {
     const data = await fetch(
       `/api/posts?searchKeyword=${search ? search : ""}`
     ).then(res => res.json())
 
-    data.length === 0 && setNotFound(true)
+    data.length === 0 ? setNotFound(true) : setNotFound(false)
+
     setPosts(data)
-    setLoaded(true)
   }
 
   function onSearch(e) {
@@ -40,18 +44,10 @@ export default function Home() {
         <meta name="content-type" content="utf-8" />
       </Head>
       <main>
-        {/* style={{ display: loaded ? "none" : "block" }} */}
-        {!loaded ? (
-          <div id="overlay">
-            <div className="spinner"></div>
-          </div>
-        ) : (
-          ""
-        )}
         <div className="main">
           <h1>Programing posts api</h1>
           <Link
-            href="https://rapidapi.com/youssefboulalq@gmail.com/api/programming-posts/"
+            href="https://rapidapi.com/youssefboulalq-tfIG9f8ALpe/api/programming-posts/"
             target="_blank"
             className="big-btn"
           >
@@ -74,7 +70,7 @@ export default function Home() {
             </div>
           </form>
         </div>
-        <div className={loaded ? "posts" : "posts-template"}>
+        <div className="posts">
           {posts.length > 0 ? (
             posts.map((post, idx) => (
               <div className="post" key={idx}>
