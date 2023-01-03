@@ -17,9 +17,9 @@ export default function Home({ posts: serverSidePosts }) {
   const [searchKeyword, setSearchKeyword] = useState("")
 
   async function loadPosts(search) {
-    const data = await fetch(`${API_URL}?keyword=${search ? search : ""}`).then(
-      res => res.json()
-    )
+    const data = await fetch(
+      `${API_URL}?keyword=${search ? search : ""}&limit=100`
+    ).then(res => res.json())
 
     data.length === 0 ? setNotFound(true) : setNotFound(false)
 
@@ -28,7 +28,7 @@ export default function Home({ posts: serverSidePosts }) {
 
   function onSearch(e) {
     e.preventDefault()
-    loadPosts(e.target.value)
+    loadPosts(searchKeyword)
   }
 
   return (
