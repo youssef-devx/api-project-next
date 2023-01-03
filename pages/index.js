@@ -17,13 +17,13 @@ export default function Home({ posts: serverSidePosts }) {
   const [searchKeyword, setSearchKeyword] = useState("")
 
   async function loadPosts(search) {
-    const data = await fetch(`${API_URL}?Keyword=${search ? search : ""}`).then(
+    const data = await fetch(`${API_URL}?keyword=${search ? search : ""}`).then(
       res => res.json()
     )
 
     data.length === 0 ? setNotFound(true) : setNotFound(false)
 
-    setPosts(data)
+    setPosts(data.slice(0, 100))
   }
 
   function onSearch(e) {
