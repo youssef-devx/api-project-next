@@ -7,7 +7,7 @@ export async function getServerSideProps() {
   const posts = await fetch(API_URL).then(res => res.json())
 
   return {
-    props: { posts },
+    props: { posts: posts.slice(0, 50) },
   }
 }
 
@@ -17,9 +17,9 @@ export default function Home({ posts: serverSidePosts }) {
   const [searchKeyword, setSearchKeyword] = useState("")
 
   async function loadPosts(search) {
-    const data = await fetch(
-      `/api/posts?searchKeyword=${search ? search : ""}`
-    ).then(res => res.json())
+    const data = await fetch(`${API_URL}?Keyword=${search ? search : ""}`).then(
+      res => res.json()
+    )
 
     data.length === 0 ? setNotFound(true) : setNotFound(false)
 
