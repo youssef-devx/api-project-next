@@ -14,13 +14,14 @@ export async function getServerSideProps() {
 export default function Home({ posts: serverSidePosts }) {
   const [posts, setPosts] = useState(serverSidePosts)
   const [notFound, setNotFound] = useState(false)
+  const [searching, setSearching] = useState(false)
   const [searchKeyword, setSearchKeyword] = useState("")
 
   async function loadPosts(search) {
     const data = await fetch(
       `${API_URL}?keyword=${search ? search : ""}&limit=100`
     ).then(res => res.json())
-
+    setSearching(false)
     data.length === 0 ? setNotFound(true) : setNotFound(false)
 
     setPosts(data.slice(0, 100))
@@ -28,6 +29,7 @@ export default function Home({ posts: serverSidePosts }) {
 
   function onSearch(e) {
     e.preventDefault()
+    setSearching(true)
     loadPosts(searchKeyword)
   }
 
@@ -64,8 +66,16 @@ export default function Home({ posts: serverSidePosts }) {
                 placeholder="Search for a keyword"
                 id="search"
               />
-              <button className="search-btn" onClick={onSearch}>
-                Search
+              <button
+                disabled={searching}
+                style={{
+                  cursor: searching ? "not-allowed" : "",
+                  backgroundColor: searching ? "gray" : "",
+                }}
+                className="search-btn"
+                onClick={onSearch}
+              >
+                {searching ? "Searching..." : "Search"}
               </button>
             </div>
           </form>
