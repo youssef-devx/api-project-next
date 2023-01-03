@@ -28,7 +28,7 @@ export default function Home({ posts: serverSidePosts }) {
 
   function onSearch(e) {
     e.preventDefault()
-    loadPosts(searchKeyword)
+    loadPosts(e.target.value)
   }
 
   return (
