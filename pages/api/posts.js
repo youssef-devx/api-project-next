@@ -8,5 +8,5 @@ export default function handler(req, res) {
     ? db.filter(post => regex.test(post.description) || regex.test(post.title))
     : db
 
-  res.status(200).json(posts.slice(0, 100).sort((a, b) => 0.5 - Math.random()))
+  res.status(200).json(posts.sort((a, b) => 0.5 - Math.random()).slice(0, 100))
 }
