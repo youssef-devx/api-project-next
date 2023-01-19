@@ -1,37 +1,27 @@
 import Head from "next/head"
 import Link from "next/link"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { API_URL } from "../config"
+import Header from "./components/Header"
+import PostsSkeleton from "./components/PostsSkeleton"
 
-export async function getServerSideProps() {
-  const posts = await fetch(API_URL).then(res => res.json())
-
-  return {
-    props: { posts: posts.slice(0, 50) },
-  }
-}
-
-export default function Home({ posts: serverSidePosts }) {
-  const [posts, setPosts] = useState(serverSidePosts)
-  const [notFound, setNotFound] = useState(false)
+export default function Home() {
+  const [posts, setPosts] = useState([])
+  const [preLoading, setPreLoading] = useState(true)
   const [searching, setSearching] = useState(false)
-  const [searchKeyword, setSearchKeyword] = useState("")
+  const [notFound, setNotFound] = useState(false)
 
-  async function loadPosts(search) {
-    const data = await fetch(
-      `${API_URL}?keyword=${search ? search : ""}&limit=100`
-    ).then(res => res.json())
-    setSearching(false)
-    data.length === 0 ? setNotFound(true) : setNotFound(false)
+  useEffect(() => {
 
-    setPosts(data.slice(0, 100))
-  }
+    async function fetchPosts() {
+      const posts = await fetch(API_URL).then(res => res.json())
 
-  function onSearch(e) {
-    e.preventDefault()
-    setSearching(true)
-    loadPosts(searchKeyword)
-  }
+      setPosts(posts)
+      setPreLoading(false)
+    }
+    fetchPosts()
+
+  }, [])
 
   return (
     <>
@@ -45,43 +35,14 @@ export default function Home({ posts: serverSidePosts }) {
         <link rel="icon" href="/favicon.ico" />
         <meta name="content-type" content="utf-8" />
       </Head>
-      <main>
-        <div className="main">
-          <h1>Programing posts api</h1>
-          <Link
-            href="https://rapidapi.com/youssefboulalq-tfIG9f8ALpe/api/programming-posts/"
-            target="_blank"
-            className="big-btn"
-          >
-            Get The Api Key
-          </Link>
-          <form onSubmit={onSearch}>
-            <div className="flex">
-              <label htmlFor="search">Search:</label>
-              <input
-                onChange={e => setSearchKeyword(e.target.value)}
-                value={searchKeyword}
-                type="text"
-                className="search-input"
-                placeholder="Search for a keyword"
-                id="search"
-              />
-              <button
-                disabled={searching}
-                style={{
-                  cursor: searching ? "not-allowed" : "",
-                  backgroundColor: searching ? "gray" : "",
-                }}
-                className="search-btn"
-                onClick={onSearch}
-              >
-                {searching ? "Searching..." : "Search"}
-              </button>
-            </div>
-          </form>
+      {preLoading ? (
+        <div id="overlay">
+          <div className="spinner"></div>
         </div>
+      ) : <main>
+        <Header setPosts={setPosts} searching={searching} setSearching={setSearching} setNotFound={setNotFound} />
         <div className="posts">
-          {posts.length > 0 ? (
+          {posts.length > 0 && (
             posts.map((post, idx) => (
               <div className="post" key={idx}>
                 <h2 className="title">{post.title}</h2>
@@ -96,16 +57,11 @@ export default function Home({ posts: serverSidePosts }) {
                 </div>
               </div>
             ))
-          ) : (
-            <></>
           )}
-          {notFound ? (
-            <div className="err">Not found! try another keyword</div>
-          ) : (
-            ""
-          )}
+          {searching && <PostsSkeleton />}
+          {notFound && !searching && <div className="err">Not found! try another keyword</div>}
         </div>
-      </main>
+      </main>}
     </>
   )
 }
